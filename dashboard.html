@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JY Agroflorestal - Dashboard</title>
+    <meta name="theme-color" content="#7CB342">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #7CB342;
+            --dark-green: #689F38;
+            --light-green: #AED581;
+            --brown: #8D6E63;
+            --dark-brown: #5D4037;
+            --white: #ffffff;
+            --gray: #9E9E9E;
+            --dark-gray: #424242;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--light-green) 0%, var(--primary-green) 100%);
+            min-height: 100vh;
+            color: var(--dark-gray);
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(124, 179, 66, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-text {
+            text-align: left;
+        }
+
+        .header h1 {
+            color: var(--brown);
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: var(--gray);
+            font-size: 1.1em;
+        }
+
+        .btn-refresh {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(124, 179, 66, 0.3);
+        }
+
+        .btn-refresh:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(124, 179, 66, 0.4);
+        }
+
+        .filters-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: 1px solid rgba(124, 179, 66, 0.2);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: var(--brown);
+            font-size: 1.1em;
+        }
+
+        .filter-group select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(124, 179, 66, 0.1);
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(124, 179, 66, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green) 0%, var(--brown) 100%);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+        }
+
+        .card h3 {
+            color: var(--brown);
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .card-value {
+            font-size: 2.8em;
+            font-weight: bold;
+            color: var(--primary-green);
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: var(--gray);
+            font-size: 0.95em;
+        }
+
+        .table-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 1px solid rgba(124, 179, 66, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .table-header h3 {
+            color: var(--brown);
+            font-size: 1.6em;
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-edit-mode, .btn-save {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 15px rgba(124, 179, 66, 0.3);
+        }
+
+        .btn-edit-mode:hover, .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(124, 179, 66, 0.4);
+        }
+
+        .btn-edit-mode.active {
+            background: linear-gradient(135deg, var(--brown) 0%, var(--dark-brown) 100%);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-save:hover {
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .scroll-hint {
+            background: rgba(124, 179, 66, 0.1);
+            color: var(--brown);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            border: 1px solid rgba(124, 179, 66, 0.3);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            max-width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            min-width: 2000px;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+            white-space: nowrap;
+            font-size: 0.9em;
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--brown) 0%, var(--dark-brown) 100%);
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            font-size: 0.85em;
+        }
+
+        tbody tr {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(124, 179, 66, 0.1);
+        }
+
+        tbody tr.selected {
+            background: rgba(124, 179, 66, 0.2);
+            border-left: 4px solid var(--primary-green);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .editable-cell {
+            position: relative;
+            cursor: text;
+            background: rgba(124, 179, 66, 0.05);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .editable-cell:hover {
+            background: rgba(124, 179, 66, 0.1);
+            border-color: var(--primary-green);
+        }
+
+        .editable-cell input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: inherit;
+            font-family: inherit;
+            color: inherit;
+            padding: 0;
+        }
+
+        .edit-mode-active tbody tr {
+            cursor: default;
+        }
+
+        .edit-mode-active tbody tr:hover {
+            background: transparent;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(124, 179, 66, 0.2);
+        }
+
+        .chart-container h3 {
+            color: var(--brown);
+            font-size: 1.6em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .chart-wrapper {
+            width: 100%;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .chart-bar:hover {
+            background: rgba(124, 179, 66, 0.1);
+            transform: translateX(5px);
+        }
+
+        .chart-label {
+            min-width: 200px;
+            font-weight: 600;
+            color: var(--dark-gray);
+            font-size: 0.9em;
+        }
+
+        .chart-bar-fill {
+            flex: 1;
+            height: 25px;
+            background: #e0e0e0;
+            border-radius: 12px;
+            margin: 0 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-bar-value {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            border-radius: 12px;
+            transition: width 0.8s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.85em;
+            min-width: 30px;
+        }
+
+        .chart-count {
+            min-width: 60px;
+            text-align: right;
+            font-weight: bold;
+            color: var(--brown);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 900px;
+            max-height: 80vh;
+            width: 100%;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--brown) 0%, var(--dark-brown) 100%);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .modal-field {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-green);
+        }
+
+        .modal-field-label {
+            font-size: 0.85em;
+            color: var(--gray);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .modal-field-value {
+            font-size: 1.1em;
+            color: var(--dark-gray);
+            font-weight: 600;
+        }
+
+        .modal-photos {
+            margin-top: 30px;
+        }
+
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .photo-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid rgba(124, 179, 66, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .photo-card:hover {
+            border-color: var(--primary-green);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .photo-card h4 {
+            color: var(--brown);
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .photo-preview {
+            width: 100%;
+            height: 200px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photo-preview:hover {
+            background: #d0d0d0;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .photo-placeholder {
+            color: #666;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .photo-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-photo {
+            flex: 1;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            color: white;
+        }
+
+        .btn-view:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(124, 179, 66, 0.4);
+        }
+
+        .btn-upload {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+        }
+
+        .btn-upload:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+        }
+
+        /* Modal de ampliação de foto */
+        .photo-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .photo-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .photo-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .photo-close {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .photo-close:hover {
+            background: white;
+            transform: scale(1.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #666;
+            padding: 60px 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: var(--brown);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                text-align: center;
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-value {
+                font-size: 2.2em;
+            }
+
+            .modal-content {
+                margin: 10px;
+                max-height: 90vh;
+            }
+
+            .modal-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters-container {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-label {
+                min-width: 120px;
+                font-size: 0.8em;
+            }
+            
+            table {
+                min-width: 1500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-text">
+            <h1>🌱 JY Agroflorestal - Dashboard</h1>
+            <p>Sistema de Avaliações - Controle de Qualidade</p>
+        </div>
+        <button class="btn-refresh" onclick="atualizarDados()">
+            🔄 Atualizar Dados
+        </button>
+    </div>
+
+    <div class="filters-container">
+        <div class="filter-group">
+            <label for="filtroFazenda">🏢 Filtrar por Fazenda:</label>
+            <select id="filtroFazenda" onchange="aplicarFiltros()">
+                <option value="">Todas as Fazendas</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="filtroTalhao">📍 Filtrar por Talhão:</label>
+            <select id="filtroTalhao" onchange="aplicarFiltros()">
+                <option value="">Todos os Talhões</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="cards-container">
+        <div class="card">
+            <h3>📊 Total de Avaliações</h3>
+            <div class="card-value" id="totalAvaliacoes">0</div>
+            <p>Avaliações realizadas</p>
+        </div>
+        
+        <div class="card">
+            <h3>⚠️ Percentual de Falhas</h3>
+            <div class="card-value" id="percentualFalhas">0%</div>
+            <p>Média de falhas detectadas</p>
+        </div>
+        
+        <div class="card">
+            <h3>🌱 Sobrevivência do Talhão</h3>
+            <div class="card-value" id="sobrevivenciaTalhao">0%</div>
+            <p>Taxa de sobrevivência média</p>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div class="table-header">
+            <h3>📋 Avaliações Detalhadas</h3>
+            <div class="table-controls">
+                <button class="btn-edit-mode" id="btnEditMode" onclick="toggleEditMode()">
+                    ✏️ Modo Edição
+                </button>
+                <button class="btn-save" id="btnSave" onclick="salvarAlteracoes()" style="display: none;">
+                    💾 Salvar Alterações
+                </button>
+            </div>
+        </div>
+        
+        <div class="scroll-hint">
+            ⬅️ Deslize para ver todos os campos • Clique na linha para ver detalhes ➡️
+        </div>
+        
+        <div class="table-wrapper">
+            <table id="tabelaAvaliacoes">
+                <thead>
+                    <tr>
+                        <th>📅 Data Avaliação</th>
+                        <th>🏢 Fazenda</th>
+                        <th>📍 Talhão</th>
+                        <th>🧬 Clone</th>
+                        <th>📅 Data Plantio</th>
+                        <th>📊 Dias Avaliação</th>
+                        <th>🌱 Idade Plantio</th>
+                        <th>🔢 Mudas Avaliadas</th>
+                        <th>📏 Área Talhão (ha)</th>
+                        <th>📐 Área Avaliada (ha)</th>
+                        <th>👨‍🌾 Avaliador</th>
+                        <th>🌱 Viveiro</th>
+                        <th>📋 Status Carga</th>
+                        <th>💔 Quebradas</th>
+                        <th>🐛 Formigas</th>
+                        <th>🦶 Pisoteadas</th>
+                        <th>🌱 Sem Plantar</th>
+                        <th>🕳️ Coleto Afogado</th>
+                        <th>📦 Substrato Exposto</th>
+                        <th>🔥 Queima Adubo</th>
+                        <th>🌿 Raiz Paralisada</th>
+                        <th>🍯 Canela Preta</th>
+                        <th>🦗 Gafanhotos</th>
+                        <th>🌡️ Escaldadura</th>
+                        <th>🍂 Outros</th>
+                        <th>🐄 Ausência de Cova</th>
+                        <th>💧 Erosão</th>
+                        <th>🐜 Pragas</th>
+                        <th>💚 Quebradas Vivas</th>
+                        <th>🌿 Tombadas Vivas</th>
+                        <th>☀️ Escaldadura Vivas</th>
+                        <th>🚜 Falsa Subsolagem Toco</th>
+                        <th>🔥 Queimada Viva</th>
+                        <th>🦗 Raspagem Grilo 2º Nível</th>
+                        <th>⚠️ Total Falhas</th>
+                        <th>📊 % Falhas</th>
+                        <th>🌱 % Sobrevivência</th>
+                        <th>✅ Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="38" class="empty-state">
+                            <div>Nenhuma avaliação registrada ainda</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-wrapper" id="chartWrapper">
+            <div class="empty-state">
+                <h3>Aguardando Dados</h3>
+                <p>O gráfico aparecerá quando houver avaliações</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 id="modalTitle">Detalhes da Avaliação</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Conteúdo será inserido dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de ampliação de foto -->
+    <div class="photo-modal" id="photoModal" onclick="closePhotoModal()">
+        <button class="photo-close" onclick="closePhotoModal()">&times;</button>
+        <img id="photoModalImg" src="" alt="Foto ampliada" onclick="event.stopPropagation()">
+    </div>
+
+    <script>
+        // Configuração da API
+        const API_BASE_URL = window.location.origin + '/api';
+        
+        // Dados carregados da API
+        let avaliacoes = [];
+        let avaliacoesFiltradas = [];
+        let selectedRow = null;
+        let editMode = false;
+        let alteracoesPendentes = new Map();
+
+        // Função para formatar datas de forma segura
+        function formatarData(dataString) {
+            if (!dataString) return 'Data não informada';
+            
+            try {
+                // Tratar diferentes formatos de data
+                let data;
+                
+                if (dataString instanceof Date) {
+                    data = dataString;
+                } else if (typeof dataString === 'string') {
+                    // Se já contém horário, usar diretamente
+                    if (dataString.includes('T')) {
+                        data = new Date(dataString);
+                    } else {
+                        // Adicionar horário para evitar problemas de timezone
+                        data = new Date(dataString + 'T12:00:00');
+                    }
+                } else {
+                    // Se for timestamp
+                    data = new Date(dataString);
+                }
+                
+                // Verificar se a data é válida
+                if (isNaN(data.getTime())) {
+                    console.warn('Data inválida:', dataString);
+                    return 'Data inválida';
+                }
+                
+                return data.toLocaleDateString('pt-BR');
+            } catch (error) {
+                console.error('Erro ao formatar data:', dataString, error);
+                return 'Erro na data';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarDados();
+        });
+
+        async function carregarDados() {
+            try {
+                // Buscar avaliações
+                const responseAvaliacoes = await fetch(`${API_BASE_URL}/avaliacoes`);
+                if (!responseAvaliacoes.ok) throw new Error('Erro ao buscar avaliações');
+                avaliacoes = await responseAvaliacoes.json();
+                avaliacoesFiltradas = [...avaliacoes];
+                
+                // Inicializar interface
+                await inicializarFiltros();
+                atualizarDashboard();
+                atualizarTabela();
+                atualizarGrafico();
+                
+                console.log('✅ Dados carregados com sucesso:', avaliacoes.length, 'avaliações');
+            } catch (error) {
+                console.error('❌ Erro ao carregar dados:', error);
+                // Fallback para dados de exemplo se a API falhar
+                await carregarDadosExemplo();
+            }
+        }
+
+        async function carregarDadosExemplo() {
+            console.log('🔄 Carregando dados de exemplo...');
+            // Dados de exemplo (mantidos como fallback)
+            avaliacoes = [
+                {
+                    id: 1,
+                    data_avaliacao: '2024-09-15',
+                    fazenda: 'Vale do Rio da Prata',
+                    talhao: '76',
+                    clone: 'AEC 144',
+                    data_plantio: '2024-08-20',
+                    dias_avaliacao: 26,
+                    idade_plantio: 87,
+                    mudas_avaliadas: 4480,
+                    area_talhao: 24.37,
+                    area_avaliada: 15.41,
+                    avaliador: 'Marco Thulio',
+                    viveiro: 'Santa Isabel',
+                    status_carga: 'Reprovada',
+                    quebradas: 45,
+                    formigas: 32,
+                    pisoteadas: 18,
+                    sem_plantar: 15,
+                    coleto_afogado: 12,
+                    substrato_exposto: 8,
+                    queima_adubo: 4,
+                    raiz_paralisada: 0,
+                    canela_preta: 0,
+                    gafanhotos: 0,
+                    escaldadura: 0,
+                    outros: 0,
+                    ausencia_de_cova: 0,
+                    erosao: 0,
+                    pragas: 0,
+                    quebradas_vivas: 0,
+                    tombadas_vivas: 0,
+                    escaldadura_vivas: 0,
+                    falsa_subsolagem_toco: 0,
+                    queimada_viva: 0,
+                    raspagem_grilo_2_nivel: 0,
+                    totalFalhas: 134,
+                    percentualFalhas: 2.99,
+                    foto_area: 'https://images.unsplash.com/photo-1574706778754-73b8f6db1a88?w=800&h=600&fit=crop',
+                    foto_linha: 'https://images.unsplash.com/photo-1566847438217-76e82d383f84?w=800&h=600&fit=crop'
+                },
+                {
+                    id: 2,
+                    data_avaliacao: '2024-09-10',
+                    fazenda: 'Fazenda Nova Esperança',
+                    talhao: '45',
+                    clone: 'AEC 224',
+                    data_plantio: '2024-08-15',
+                    dias_avaliacao: 26,
+                    idade_plantio: 82,
+                    mudas_avaliadas: 3200,
+                    area_talhao: 18.5,
+                    area_avaliada: 12.3,
+                    avaliador: 'Ana Silva',
+                    viveiro: 'São Pedro',
+                    status_carga: 'Aprovada',
+                    quebradas: 20,
+                    formigas: 15,
+                    pisoteadas: 8,
+                    sem_plantar: 3,
+                    coleto_afogado: 2,
+                    substrato_exposto: 0,
+                    queima_adubo: 0,
+                    raiz_paralisada: 0,
+                    canela_preta: 0,
+                    gafanhotos: 0,
+                    escaldadura: 0,
+                    outros: 0,
+                    ausencia_de_cova: 0,
+                    erosao: 0,
+                    pragas: 0,
+                    quebradas_vivas: 0,
+                    tombadas_vivas: 0,
+                    escaldadura_vivas: 0,
+                    falsa_subsolagem_toco: 0,
+                    queimada_viva: 0,
+                    raspagem_grilo_2_nivel: 0,
+                    totalFalhas: 48,
+                    percentualFalhas: 1.5,
+                    foto_area: null,
+                    foto_linha: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&h=600&fit=crop'
+                },
+                {
+                    id: 3,
+                    data_avaliacao: '2024-09-08',
+                    fazenda: 'Sítio Verde',
+                    talhao: '12',
+                    clone: 'AEC 144',
+                    data_plantio: '2024-08-01',
+                    dias_avaliacao: 38,
+                    idade_plantio: 75,
+                    mudas_avaliadas: 2800,
+                    area_talhao: 16.2,
+                    area_avaliada: 10.8,
+                    avaliador: 'João Santos',
+                    viveiro: 'Santa Isabel',
+                    status_carga: 'Aprovada',
+                    quebradas: 18,
+                    formigas: 12,
+                    pisoteadas: 6,
+                    sem_plantar: 4,
+                    coleto_afogado: 2,
+                    substrato_exposto: 0,
+                    queima_adubo: 0,
+                    raiz_paralisada: 0,
+                    canela_preta: 0,
+                    gafanhotos: 0,
+                    escaldadura: 0,
+                    outros: 0,
+                    ausencia_de_cova: 0,
+                    erosao: 0,
+                    pragas: 0,
+                    quebradas_vivas: 0,
+                    tombadas_vivas: 0,
+                    escaldadura_vivas: 0,
+                    falsa_subsolagem_toco: 0,
+                    queimada_viva: 0,
+                    raspagem_grilo_2_nivel: 0,
+                    totalFalhas: 42,
+                    percentualFalhas: 1.5,
+                    foto_area: 'https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?w=800&h=600&fit=crop',
+                    foto_linha: null
+                }
+            ];
+            
+            avaliacoesFiltradas = [...avaliacoes];
+            inicializarFiltros();
+            atualizarDashboard();
+            atualizarTabela();
+            atualizarGrafico();
+        }
+
+        async function inicializarFiltros() {
+            try {
+                // Buscar fazendas da API
+                const responseFazendas = await fetch(`${API_BASE_URL}/fazendas`);
+                const fazendas = responseFazendas.ok ? await responseFazendas.json() : [...new Set(avaliacoes.map(a => a.fazenda).filter(f => f))];
+                
+                // Buscar talhões da API
+                const responseTalhoes = await fetch(`${API_BASE_URL}/talhoes`);
+                const talhoes = responseTalhoes.ok ? await responseTalhoes.json() : [...new Set(avaliacoes.map(a => a.talhao).filter(t => t))];
+                
+                const selectFazenda = document.getElementById('filtroFazenda');
+                const selectTalhao = document.getElementById('filtroTalhao');
+                
+                // Limpar opções existentes
+                selectFazenda.innerHTML = '<option value="">Todas as Fazendas</option>';
+                selectTalhao.innerHTML = '<option value="">Todos os Talhões</option>';
+                
+                fazendas.forEach(fazenda => {
+                    const option = document.createElement('option');
+                    option.value = fazenda;
+                    option.textContent = fazenda;
+                    selectFazenda.appendChild(option);
+                });
+                
+                talhoes.forEach(talhao => {
+                    const option = document.createElement('option');
+                    option.value = talhao;
+                    option.textContent = talhao;
+                    selectTalhao.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro ao inicializar filtros:', error);
+                // Fallback para dados locais
+                const fazendas = [...new Set(avaliacoes.map(a => a.fazenda).filter(f => f))];
+                const talhoes = [...new Set(avaliacoes.map(a => a.talhao).filter(t => t))];
+                
+                const selectFazenda = document.getElementById('filtroFazenda');
+                const selectTalhao = document.getElementById('filtroTalhao');
+                
+                selectFazenda.innerHTML = '<option value="">Todas as Fazendas</option>';
+                selectTalhao.innerHTML = '<option value="">Todos os Talhões</option>';
+                
+                fazendas.forEach(fazenda => {
+                    const option = document.createElement('option');
+                    option.value = fazenda;
+                    option.textContent = fazenda;
+                    selectFazenda.appendChild(option);
+                });
+                
+                talhoes.forEach(talhao => {
+                    const option = document.createElement('option');
+                    option.value = talhao;
+                    option.textContent = talhao;
+                    selectTalhao.appendChild(option);
+                });
+            }
+        }
+
+        function aplicarFiltros() {
+            const fazendaSelecionada = document.getElementById('filtroFazenda').value;
+            const talhaoSelecionado = document.getElementById('filtroTalhao').value;
+            
+            avaliacoesFiltradas = avaliacoes.filter(avaliacao => {
+                const matchFazenda = !fazendaSelecionada || avaliacao.fazenda === fazendaSelecionada;
+                const matchTalhao = !talhaoSelecionado || avaliacao.talhao === talhaoSelecionado;
+                return matchFazenda && matchTalhao;
+            });
+            
+            selectedRow = null;
+            document.querySelectorAll('tbody tr').forEach(tr => tr.classList.remove('selected'));
+            
+            atualizarDashboard();
+            atualizarTabela();
+            atualizarGrafico();
+        }
+
+        function atualizarDashboard() {
+            const dadosParaCalcular = selectedRow ? [selectedRow] : avaliacoesFiltradas;
+            
+            const totalAvaliacoes = dadosParaCalcular.length;
+            const mediaFalhas = totalAvaliacoes > 0 
+                ? (dadosParaCalcular.reduce((acc, curr) => acc + curr.percentualFalhas, 0) / totalAvaliacoes).toFixed(1)
+                : 0;
+            const mediaSobrevivencia = totalAvaliacoes > 0 
+                ? (100 - parseFloat(mediaFalhas)).toFixed(1)
+                : 0;
+            
+            document.getElementById('totalAvaliacoes').textContent = totalAvaliacoes;
+            document.getElementById('percentualFalhas').textContent = mediaFalhas + '%';
+            document.getElementById('sobrevivenciaTalhao').textContent = mediaSobrevivencia + '%';
+        }
+
+        function atualizarTabela() {
+            const tbody = document.querySelector('#tabelaAvaliacoes tbody');
+            
+            if (avaliacoesFiltradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="38" class="empty-state"><div>Nenhuma avaliação encontrada</div></td></tr>';
+                return;
+            }
+            
+            const linhas = avaliacoesFiltradas.map(avaliacao => {
+                const dataAvaliacao = formatarData(avaliacao.data_avaliacao);
+                const dataPlantio = formatarData(avaliacao.data_plantio);
+                const sobrevivencia = (100 - avaliacao.percentualFalhas).toFixed(1);
+                const status = avaliacao.percentualFalhas <= 10 ? 'OK' : avaliacao.percentualFalhas <= 25 ? 'Atenção' : 'Crítico';
+                
+                return `
+                    <tr onclick="${editMode ? '' : `selecionarLinha(this, ${avaliacao.id})`}" data-id="${avaliacao.id}" class="${editMode ? 'edit-mode-row' : ''}">
+                        <td>${dataAvaliacao}</td>
+                        <td>${avaliacao.fazenda}</td>
+                        <td>${avaliacao.talhao}</td>
+                        <td>${avaliacao.clone}</td>
+                        <td>${dataPlantio}</td>
+                        <td>${avaliacao.dias_avaliacao}</td>
+                        <td>${avaliacao.idade_plantio}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="mudas_avaliadas" data-id="${avaliacao.id}">${avaliacao.mudas_avaliadas.toLocaleString()}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="area_talhao" data-id="${avaliacao.id}">${avaliacao.area_talhao}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="area_avaliada" data-id="${avaliacao.id}">${avaliacao.area_avaliada}</td>
+                        <td>${avaliacao.avaliador}</td>
+                        <td>${avaliacao.viveiro}</td>
+                        <td>${avaliacao.status_carga}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="quebradas" data-id="${avaliacao.id}">${avaliacao.quebradas}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="formigas" data-id="${avaliacao.id}">${avaliacao.formigas}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="pisoteadas" data-id="${avaliacao.id}">${avaliacao.pisoteadas}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="sem_plantar" data-id="${avaliacao.id}">${avaliacao.sem_plantar}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="coleto_afogado" data-id="${avaliacao.id}">${avaliacao.coleto_afogado}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="substrato_exposto" data-id="${avaliacao.id}">${avaliacao.substrato_exposto}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="queima_adubo" data-id="${avaliacao.id}">${avaliacao.queima_adubo}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="raiz_paralisada" data-id="${avaliacao.id}">${avaliacao.raiz_paralisada}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="canela_preta" data-id="${avaliacao.id}">${avaliacao.canela_preta}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="gafanhotos" data-id="${avaliacao.id}">${avaliacao.gafanhotos}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="escaldadura" data-id="${avaliacao.id}">${avaliacao.escaldadura}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="outros" data-id="${avaliacao.id}">${avaliacao.outros}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="ausencia_de_cova" data-id="${avaliacao.id}">${avaliacao.ausencia_de_cova}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="erosao" data-id="${avaliacao.id}">${avaliacao.erosao}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="pragas" data-id="${avaliacao.id}">${avaliacao.pragas}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="quebradas_vivas" data-id="${avaliacao.id}">${avaliacao.quebradas_vivas}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="tombadas_vivas" data-id="${avaliacao.id}">${avaliacao.tombadas_vivas}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="escaldadura_vivas" data-id="${avaliacao.id}">${avaliacao.escaldadura_vivas}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="falsa_subsolagem_toco" data-id="${avaliacao.id}">${avaliacao.falsa_subsolagem_toco}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="queimada_viva" data-id="${avaliacao.id}">${avaliacao.queimada_viva}</td>
+                        <td class="${editMode ? 'editable-cell' : ''}" data-field="raspagem_grilo_2_nivel" data-id="${avaliacao.id}">${avaliacao.raspagem_grilo_2_nivel}</td>
+                        <td>${avaliacao.totalFalhas}</td>
+                        <td>${avaliacao.percentualFalhas}%</td>
+                        <td>${sobrevivencia}%</td>
+                        <td><span style="color: ${status === 'OK' ? '#4CAF50' : status === 'Atenção' ? '#FF9800' : '#F44336'}">${status}</span></td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = linhas.join('');
+            
+            // Adiciona/remove classe para modo de edição
+            const tableContainer = document.querySelector('.table-container');
+            if (editMode) {
+                tableContainer.classList.add('edit-mode-active');
+                // Adicionar event listeners para células editáveis
+                adicionarEventListenersEdicao();
+            } else {
+                tableContainer.classList.remove('edit-mode-active');
+            }
+        }
+
+        function adicionarEventListenersEdicao() {
+            const celulasEditaveis = document.querySelectorAll('.editable-cell');
+            
+            celulasEditaveis.forEach(celula => {
+                celula.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Evitar que dispare o clique da linha
+                    
+                    const avaliacaoId = parseInt(this.getAttribute('data-id'));
+                    const campo = this.getAttribute('data-field');
+                    
+                    console.log('Clicou na célula editável:', { avaliacaoId, campo });
+                    tornarEditavel(this, avaliacaoId, campo);
+                });
+                
+                celula.style.cursor = 'pointer';
+            });
+        }
+
+        function selecionarLinha(row, id) {
+            // Remove seleção anterior
+            if (selectedRow) {
+                document.querySelectorAll('tbody tr').forEach(tr => tr.classList.remove('selected'));
+            }
+            
+            // Adiciona seleção na nova linha
+            row.classList.add('selected');
+            selectedRow = avaliacoesFiltradas.find(a => a.id === id);
+            
+            // Atualiza dashboard com dados da linha selecionada
+            atualizarDashboard();
+            
+            // Abre modal com detalhes
+            mostrarDetalhes(selectedRow);
+        }
+
+        function mostrarDetalhes(avaliacao) {
+            const modal = document.getElementById('modalOverlay');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalTitle.textContent = `Avaliação - ${avaliacao.fazenda} - Talhão ${avaliacao.talhao}`;
+            
+            const dataAvaliacao = formatarData(avaliacao.data_avaliacao);
+            const dataPlantio = formatarData(avaliacao.data_plantio);
+            const sobrevivencia = (100 - avaliacao.percentualFalhas).toFixed(1);
+            
+            modalBody.innerHTML = `
+                <div class="modal-grid">
+                    <div class="modal-field">
+                        <div class="modal-field-label">📅 Data da Avaliação</div>
+                        <div class="modal-field-value">${dataAvaliacao}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🏢 Fazenda</div>
+                        <div class="modal-field-value">${avaliacao.fazenda}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">📍 Talhão</div>
+                        <div class="modal-field-value">${avaliacao.talhao}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🧬 Clone</div>
+                        <div class="modal-field-value">${avaliacao.clone}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">📅 Data do Plantio</div>
+                        <div class="modal-field-value">${dataPlantio}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">📊 Dias de Avaliação</div>
+                        <div class="modal-field-value">${avaliacao.dias_avaliacao} dias</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🌱 Idade do Plantio</div>
+                        <div class="modal-field-value">${avaliacao.idade_plantio} dias</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🔢 Mudas Avaliadas</div>
+                        <div class="modal-field-value">${avaliacao.mudas_avaliadas.toLocaleString()}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">📏 Área do Talhão</div>
+                        <div class="modal-field-value">${avaliacao.area_talhao} ha</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">📐 Área Avaliada</div>
+                        <div class="modal-field-value">${avaliacao.area_avaliada} ha</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">👨‍🌾 Avaliador</div>
+                        <div class="modal-field-value">${avaliacao.avaliador}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🌱 Viveiro</div>
+                        <div class="modal-field-value">${avaliacao.viveiro}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">📋 Status da Carga</div>
+                        <div class="modal-field-value">${avaliacao.status_carga}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">⚠️ Total de Falhas</div>
+                        <div class="modal-field-value">${avaliacao.totalFalhas}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">📊 Percentual de Falhas</div>
+                        <div class="modal-field-value">${avaliacao.percentualFalhas}%</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🌱 Taxa de Sobrevivência</div>
+                        <div class="modal-field-value">${sobrevivencia}%</div>
+                    </div>
+                </div>
+                
+                <h4 style="margin-top: 30px; margin-bottom: 20px; color: var(--brown);">📊 Detalhamento das Não Conformidades</h4>
+                <div class="modal-grid">
+                    <div class="modal-field">
+                        <div class="modal-field-label">💔 Quebradas</div>
+                        <div class="modal-field-value">${avaliacao.quebradas}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🐛 Formigas</div>
+                        <div class="modal-field-value">${avaliacao.formigas}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🦶 Pisoteadas</div>
+                        <div class="modal-field-value">${avaliacao.pisoteadas}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🌱 Sem Plantar</div>
+                        <div class="modal-field-value">${avaliacao.sem_plantar}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🕳️ Coleto Afogado</div>
+                        <div class="modal-field-value">${avaliacao.coleto_afogado}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">📦 Substrato Exposto</div>
+                        <div class="modal-field-value">${avaliacao.substrato_exposto}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🔥 Queima Adubo</div>
+                        <div class="modal-field-value">${avaliacao.queima_adubo}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🌿 Raiz Paralisada</div>
+                        <div class="modal-field-value">${avaliacao.raiz_paralisada}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🍯 Canela Preta</div>
+                        <div class="modal-field-value">${avaliacao.canela_preta}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🦗 Gafanhotos</div>
+                        <div class="modal-field-value">${avaliacao.gafanhotos}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🌡️ Escaldadura</div>
+                        <div class="modal-field-value">${avaliacao.escaldadura}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🍂 Outros</div>
+                        <div class="modal-field-value">${avaliacao.outros}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🐄 Ausência de Cova</div>
+                        <div class="modal-field-value">${avaliacao.ausencia_de_cova}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">💧 Erosão</div>
+                        <div class="modal-field-value">${avaliacao.erosao}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🐜 Pragas</div>
+                        <div class="modal-field-value">${avaliacao.pragas}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">💚 Quebradas Vivas</div>
+                        <div class="modal-field-value">${avaliacao.quebradas_vivas}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🌿 Tombadas Vivas</div>
+                        <div class="modal-field-value">${avaliacao.tombadas_vivas}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">☀️ Escaldadura Vivas</div>
+                        <div class="modal-field-value">${avaliacao.escaldadura_vivas}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🚜 Falsa Subsolagem Toco</div>
+                        <div class="modal-field-value">${avaliacao.falsa_subsolagem_toco}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🔥 Queimada Viva</div>
+                        <div class="modal-field-value">${avaliacao.queimada_viva}</div>
+                    </div>
+                    <div class="modal-field">
+                        <div class="modal-field-label">🦗 Raspagem Grilo 2º Nível</div>
+                        <div class="modal-field-value">${avaliacao.raspagem_grilo_2_nivel}</div>
+                    </div>
+                </div>
+                
+                <!-- Seção de Fotos -->
+                <div class="modal-photos">
+                    <h4 style="margin-bottom: 20px; color: var(--brown); display: flex; align-items: center; gap: 10px;">
+                        📸 Documentação Fotográfica
+                    </h4>
+                    <div class="photos-grid">
+                        <div class="photo-card">
+                            <h4>📍 Foto da Área</h4>
+                            <div class="photo-preview" onclick="viewPhoto('${avaliacao.foto_area || ''}', 'Foto da Área')">
+                                ${avaliacao.foto_area ? 
+                                    `<img src="${avaliacao.foto_area}" alt="Foto da Área" loading="lazy">` :
+                                    `<div class="photo-placeholder">
+                                        <div>📷</div>
+                                        <div>Nenhuma foto da área</div>
+                                        <small>Clique para ampliar quando disponível</small>
+                                    </div>`
+                                }
+                            </div>
+                            <div class="photo-actions">
+                                ${avaliacao.foto_area ? 
+                                    `<button class="btn-photo btn-view" onclick="viewPhoto('${avaliacao.foto_area}', 'Foto da Área')">
+                                        👁️ Ampliar
+                                    </button>` :
+                                    `<button class="btn-photo btn-upload" onclick="uploadPhoto(${avaliacao.id}, 'foto_area')">
+                                        📤 Adicionar Foto
+                                    </button>`
+                                }
+                            </div>
+                        </div>
+                        
+                        <div class="photo-card">
+                            <h4>📏 Foto da Linha</h4>
+                            <div class="photo-preview" onclick="viewPhoto('${avaliacao.foto_linha || ''}', 'Foto da Linha')">
+                                ${avaliacao.foto_linha ? 
+                                    `<img src="${avaliacao.foto_linha}" alt="Foto da Linha" loading="lazy">` :
+                                    `<div class="photo-placeholder">
+                                        <div>📷</div>
+                                        <div>Nenhuma foto da linha</div>
+                                        <small>Clique para ampliar quando disponível</small>
+                                    </div>`
+                                }
+                            </div>
+                            <div class="photo-actions">
+                                ${avaliacao.foto_linha ? 
+                                    `<button class="btn-photo btn-view" onclick="viewPhoto('${avaliacao.foto_linha}', 'Foto da Linha')">
+                                        👁️ Ampliar
+                                    </button>` :
+                                    `<button class="btn-photo btn-upload" onclick="uploadPhoto(${avaliacao.id}, 'foto_linha')">
+                                        📤 Adicionar Foto
+                                    </button>`
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            
+            const modal = document.getElementById('modalOverlay');
+            modal.classList.remove('active');
+        }
+
+        function viewPhoto(photoUrl, title) {
+            if (!photoUrl) {
+                console.log('Nenhuma foto disponível para ampliar');
+                return;
+            }
+            
+            console.log('Ampliando foto:', photoUrl);
+            
+            const photoModal = document.getElementById('photoModal');
+            const photoModalImg = document.getElementById('photoModalImg');
+            
+            photoModalImg.src = photoUrl;
+            photoModalImg.alt = title;
+            photoModal.classList.add('active');
+        }
+
+        function closePhotoModal() {
+            const photoModal = document.getElementById('photoModal');
+            photoModal.classList.remove('active');
+        }
+
+        function uploadPhoto(avaliacaoId, tipoFoto) {
+            console.log('Upload de foto:', { avaliacaoId, tipoFoto });
+            
+            // Criar input file dinamicamente
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.style.display = 'none';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    console.log('Arquivo selecionado:', file.name);
+                    
+                    // Aqui você implementaria o upload real
+                    // Por enquanto, vamos simular com URL.createObjectURL
+                    const url = URL.createObjectURL(file);
+                    
+                    // Atualizar o objeto da avaliação
+                    const avaliacao = avaliacoesFiltradas.find(a => a.id === avaliacaoId);
+                    if (avaliacao) {
+                        avaliacao[tipoFoto] = url;
+                        
+                        // Fechar e reabrir modal para atualizar
+                        closeModal();
+                        setTimeout(() => mostrarDetalhes(avaliacao), 100);
+                        
+                        // Adicionar à lista de alterações pendentes
+                        salvarAlteracao(avaliacaoId, tipoFoto, url);
+                        
+                        console.log('Foto adicionada:', { avaliacaoId, tipoFoto, url });
+                    }
+                }
+                
+                // Limpar input
+                document.body.removeChild(input);
+            };
+            
+            document.body.appendChild(input);
+            input.click();
+        }
+
+        function atualizarGrafico() {
+            const chartWrapper = document.getElementById('chartWrapper');
+            const dadosParaGrafico = selectedRow ? [selectedRow] : avaliacoesFiltradas;
+            
+            if (dadosParaGrafico.length === 0) {
+                chartWrapper.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Nenhum Dado Disponível</h3>
+                        <p>Selecione uma avaliação na tabela ou ajuste os filtros</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Categorias de não conformidades
+            const categorias = [
+                { nome: 'Quebradas', campo: 'quebradas' },
+                { nome: 'Formigas', campo: 'formigas' },
+                { nome: 'Pisoteadas', campo: 'pisoteadas' },
+                { nome: 'Sem Plantar', campo: 'sem_plantar' },
+                { nome: 'Coleto Afogado', campo: 'coleto_afogado' },
+                { nome: 'Substrato Exposto', campo: 'substrato_exposto' },
+                { nome: 'Queima Adubo', campo: 'queima_adubo' },
+                { nome: 'Raiz Paralisada', campo: 'raiz_paralisada' },
+                { nome: 'Canela Preta', campo: 'canela_preta' },
+                { nome: 'Gafanhotos', campo: 'gafanhotos' },
+                { nome: 'Escaldadura', campo: 'escaldadura' },
+                { nome: 'Outros', campo: 'outros' },
+                { nome: 'Ausência de Cova', campo: 'ausencia_de_cova' },
+                { nome: 'Erosão', campo: 'erosao' },
+                { nome: 'Pragas', campo: 'pragas' },
+                { nome: 'Quebradas Vivas', campo: 'quebradas_vivas' },
+                { nome: 'Tombadas Vivas', campo: 'tombadas_vivas' },
+                { nome: 'Escaldadura Vivas', campo: 'escaldadura_vivas' },
+                { nome: 'Falsa Subsolagem Toco', campo: 'falsa_subsolagem_toco' },
+                { nome: 'Queimada Viva', campo: 'queimada_viva' },
+                { nome: 'Raspagem Grilo 2º Nível', campo: 'raspagem_grilo_2_nivel' }
+            ];
+            
+            // Calcular totais por categoria
+            const totaisPorCategoria = categorias.map(categoria => {
+                const total = dadosParaGrafico.reduce((acc, avaliacao) => acc + (avaliacao[categoria.campo] || 0), 0);
+                return { nome: categoria.nome, total };
+            }).filter(item => item.total > 0)
+              .sort((a, b) => b.total - a.total);
+            
+            if (totaisPorCategoria.length === 0) {
+                chartWrapper.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Excelente! 🎉</h3>
+                        <p>Nenhuma não conformidade registrada</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Calcular o total de mudas avaliadas para percentuais corretos
+            const totalMudasAvaliadas = dadosParaGrafico.reduce((acc, avaliacao) => acc + (avaliacao.mudas_avaliadas || 0), 0);
+            const maxTotal = Math.max(...totaisPorCategoria.map(item => item.total));
+            
+            // Adicionar título contextual
+            const tituloContexto = selectedRow 
+                ? `📊 Não Conformidades - ${selectedRow.fazenda} - Talhão ${selectedRow.talhao}`
+                : `📊 Não Conformidades - Ranking Geral`;
+            
+            const barras = totaisPorCategoria.map(item => {
+                const porcentagemRelativa = (item.total / maxTotal) * 100; // Para largura da barra
+                const porcentagemAbsoluta = totalMudasAvaliadas > 0 ? (item.total / totalMudasAvaliadas) * 100 : 0; // Percentual real
+                
+                return `
+                    <div class="chart-bar">
+                        <div class="chart-label">${item.nome}</div>
+                        <div class="chart-bar-fill">
+                            <div class="chart-bar-value" style="width: ${porcentagemRelativa}%">
+                                ${porcentagemAbsoluta.toFixed(2)}%
+                            </div>
+                        </div>
+                        <div class="chart-count">${item.total}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            chartWrapper.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px; color: var(--brown); font-weight: 600;">
+                    ${tituloContexto}
+                </div>
+                ${barras}
+            `;
+        }
+
+        function toggleEditMode() {
+            editMode = !editMode;
+            const btnEditMode = document.getElementById('btnEditMode');
+            const btnSave = document.getElementById('btnSave');
+            
+            console.log('Modo edição alternado para:', editMode);
+            
+            if (editMode) {
+                btnEditMode.textContent = '👁️ Modo Visualização';
+                btnEditMode.classList.add('active');
+                btnSave.style.display = 'inline-block';
+                console.log('Modo edição ATIVADO');
+            } else {
+                btnEditMode.textContent = '✏️ Modo Edição';
+                btnEditMode.classList.remove('active');
+                btnSave.style.display = 'none';
+                // Limpar alterações pendentes se sair do modo edição
+                alteracoesPendentes.clear();
+                console.log('Modo edição DESATIVADO');
+            }
+            
+            // Recarregar tabela para aplicar/remover modo de edição
+            console.log('Recarregando tabela...');
+            atualizarTabela();
+            
+            // Adicionar dica visual
+            const hint = document.querySelector('.scroll-hint');
+            if (editMode) {
+                hint.innerHTML = '✏️ MODO EDIÇÃO ATIVO - Clique nas células verdes para editar • Pressione ESC para cancelar ➡️';
+                hint.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                hint.style.borderColor = 'rgba(76, 175, 80, 0.5)';
+            } else {
+                hint.innerHTML = '⬅️ Deslize para ver todos os campos • Clique na linha para ver detalhes ➡️';
+                hint.style.backgroundColor = 'rgba(124, 179, 66, 0.1)';
+                hint.style.borderColor = 'rgba(124, 179, 66, 0.3)';
+            }
+        }
+
+        function tornarEditavel(celula, avaliacaoId, campo) {
+            if (!editMode) {
+                console.log('Modo edição não está ativo');
+                return;
+            }
+            
+            console.log('Tornando editável:', { avaliacaoId, campo, celula });
+            
+            // Evitar editar se já está editando
+            if (celula.querySelector('input')) {
+                console.log('Célula já está sendo editada');
+                return;
+            }
+            
+            const valorAtual = celula.textContent.replace(/[,.]/g, '').trim(); // Remove formatação
+            console.log('Valor atual:', valorAtual);
+            
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.step = campo.includes('area') ? '0.01' : '1';
+            input.value = valorAtual;
+            input.style.width = '100%';
+            input.style.padding = '4px';
+            input.style.border = '2px solid var(--primary-green)';
+            input.style.borderRadius = '4px';
+            input.style.backgroundColor = '#fff';
+            
+            // Função para salvar e restaurar
+            const salvarERestaurar = () => {
+                const novoValor = input.value;
+                console.log('Salvando valor:', novoValor);
+                
+                if (novoValor !== '' && !isNaN(novoValor)) {
+                    salvarAlteracao(avaliacaoId, campo, novoValor);
+                    celula.innerHTML = formatarValor(campo, novoValor);
+                } else {
+                    // Restaurar valor original se inválido
+                    celula.innerHTML = formatarValor(campo, valorAtual);
+                }
+            };
+            
+            input.onblur = salvarERestaurar;
+            
+            input.onkeypress = function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.blur();
+                }
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    // Restaurar valor original
+                    celula.innerHTML = formatarValor(campo, valorAtual);
+                }
+            };
+            
+            // Substituir conteúdo da célula
+            celula.innerHTML = '';
+            celula.appendChild(input);
+            input.focus();
+            input.select();
+            
+            console.log('Input criado e focado');
+        }
+
+        function formatarValor(campo, valor) {
+            if (campo === 'mudas_avaliadas') {
+                return parseInt(valor).toLocaleString();
+            }
+            if (campo.includes('area')) {
+                return parseFloat(valor).toFixed(2);
+            }
+            return parseInt(valor);
+        }
+
+        function salvarAlteracao(avaliacaoId, campo, novoValor) {
+            console.log('🔄 Salvando alteração:', { avaliacaoId, campo, novoValor });
+            
+            if (!alteracoesPendentes.has(avaliacaoId)) {
+                alteracoesPendentes.set(avaliacaoId, {});
+            }
+            
+            const valor = campo.includes('area') ? parseFloat(novoValor) : parseInt(novoValor);
+            alteracoesPendentes.get(avaliacaoId)[campo] = valor;
+            
+            console.log('💾 Alteração adicionada à lista pendente:', {
+                avaliacaoId, 
+                campo, 
+                valorOriginal: novoValor,
+                valorProcessado: valor,
+                totalPendentes: alteracoesPendentes.size
+            });
+            
+            // Atualizar também no array local
+            const avaliacao = avaliacoesFiltradas.find(a => a.id === avaliacaoId);
+            if (avaliacao) {
+                const valorAnterior = avaliacao[campo];
+                avaliacao[campo] = valor;
+                
+                console.log('📊 Valor atualizado no array local:', {
+                    campo,
+                    valorAnterior,
+                    valorNovo: valor
+                });
+                
+                // Recalcular totais se necessário
+                if (['quebradas', 'formigas', 'pisoteadas', 'sem_plantar', 'coleto_afogado', 
+                     'substrato_exposto', 'queima_adubo', 'raiz_paralisada', 'canela_preta',
+                     'gafanhotos', 'escaldadura', 'outros', 'ausencia_de_cova', 'erosao',
+                     'pragas', 'quebradas_vivas', 'tombadas_vivas', 'escaldadura_vivas',
+                     'falsa_subsolagem_toco', 'queimada_viva', 'raspagem_grilo_2_nivel'].includes(campo)) {
+                    console.log('🔢 Recalculando totais...');
+                    recalcularTotais(avaliacao);
+                }
+            } else {
+                console.warn('⚠️ Avaliação não encontrada no array local:', avaliacaoId);
+            }
+            
+            // Mostrar indicador visual de que há alterações pendentes
+            const btnSave = document.getElementById('btnSave');
+            if (alteracoesPendentes.size > 0) {
+                btnSave.textContent = `💾 Salvar ${alteracoesPendentes.size} Alteração(ões)`;
+                btnSave.style.background = 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)';
+            }
+        }
+
+        function recalcularTotais(avaliacao) {
+            const camposFalhas = ['quebradas', 'formigas', 'pisoteadas', 'sem_plantar', 'coleto_afogado', 
+                                'substrato_exposto', 'queima_adubo', 'raiz_paralisada', 'canela_preta',
+                                'gafanhotos', 'escaldadura', 'outros', 'ausencia_de_cova', 'erosao',
+                                'pragas', 'quebradas_vivas', 'tombadas_vivas', 'escaldadura_vivas',
+                                'falsa_subsolagem_toco', 'queimada_viva', 'raspagem_grilo_2_nivel'];
+            
+            avaliacao.totalFalhas = camposFalhas.reduce((total, campo) => total + (avaliacao[campo] || 0), 0);
+            avaliacao.percentualFalhas = ((avaliacao.totalFalhas / avaliacao.mudas_avaliadas) * 100).toFixed(2);
+            
+            // Atualizar dashboard
+            atualizarDashboard();
+            atualizarGrafico();
+        }
+
+        function salvarAlteracoes() {
+            if (alteracoesPendentes.size === 0) {
+                alert('Nenhuma alteração para salvar.');
+                return;
+            }
+            
+            console.log('Salvando alterações:', Object.fromEntries(alteracoesPendentes));
+            
+            // Converter Map para objeto para enviar à API
+            const alteracoes = Object.fromEntries(alteracoesPendentes);
+            
+            // Chamada à API real
+            fetch(`${API_BASE_URL}/avaliacoes/bulk-update`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(alteracoes)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erro ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(`✅ ${alteracoesPendentes.size} alteração(ões) salva(s) com sucesso!`);
+                alteracoesPendentes.clear();
+                
+                // Recarregar dados da API
+                carregarDados();
+            })
+            .catch(error => {
+                console.error('Erro ao salvar alterações:', error);
+                alert('❌ Erro ao salvar alterações: ' + error.message);
+            });
+        }
+
+        function atualizarDados() {
+            // Recarregar dados da API
+            console.log('🔄 Atualizando dados...');
+            carregarDados();
+        }
+
+        // Event listeners para fechar modal com ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+                closePhotoModal();
+            }
+        });
+    </script>
+</body>
+</html>
